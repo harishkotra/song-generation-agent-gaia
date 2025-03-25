@@ -83,17 +83,29 @@ export class SongMetadataGenerator {
   /**
    * Initializes the generator with LLM chain
    * @constructor
-   * @param {string} apiKey - OpenAI API key for authentication
+   * @param {string} apiKey - Gaia API key for authentication
+   * @param {string} modelName - Gaia node's Model Name
+   * @param {string} nodeUrl - Gaia node URL 
    * @throws {Error} If API key is missing
    */
-  constructor(apiKey: string) {
+  constructor(apiKey: string, modelName: string, nodeUrl: string) {
     if (!apiKey) {
-      throw new Error("OpenAI API key is required for SongMetadataGenerator.");
+      throw new Error("Gaia API key is required for SongMetadataGenerator.");
     }
 
+    if (!nodeUrl) {
+      throw new Error("Gaia Node URL is required for SongMetadataGenerator.");
+    }
+
+    if (!modelName) {
+      throw new Error("Gaia Node's Model Name is required for SongMetadataGenerator.");
+    }
     const llm = new ChatOpenAI({
-      model: "gpt-4o-mini",
-      apiKey,
+      model: modelName,
+      configuration: {
+        baseURL: nodeUrl,
+      },
+      apiKey: apiKey,
     });
 
     const promptTemplate = ChatPromptTemplate.fromTemplate(`

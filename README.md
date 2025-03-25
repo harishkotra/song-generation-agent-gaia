@@ -3,7 +3,7 @@
 Song Generator Agent (TypeScript)
 =================================
 
-> A TypeScript agent that listens for tasks via the **Nevermined Payments** framework, automatically generates lyrics and other metadata using **LangChain** + **OpenAI**, and then produces a final song audio track through **Suno**’s AI Music Generation API. It manages multiple steps internally, uses a modular architecture, and can be easily scaled or extended.
+> A TypeScript agent that listens for tasks via the **Nevermined Payments** framework, automatically generates lyrics and other metadata using **Gaia's OpenAI Compatible API**, and then produces a final song audio track through **Suno**’s AI Music Generation API. It manages multiple steps internally, uses a modular architecture, and can be easily scaled or extended.
 
 * * *
 
@@ -13,7 +13,7 @@ Song Generator Agent (TypeScript)
 The **Song Generator Agent** is designed to:
 
 1.  **Receive** prompts or “ideas” for songs (e.g., “A futuristic R&B track about neon cities”).
-2.  **Optionally** generate missing metadata (e.g., lyrics, title, tags) using **LangChain** and **OpenAI**.
+2.  **Optionally** generate missing metadata (e.g., lyrics, title, tags) using **Gaia's OpenAI Compatible API**.
 3.  **Invoke** the **Suno** API to synthesize an audio track (MP3) based on the prompt + metadata.
 4.  **Output** the final track’s URL, title, duration, and lyrics.
 5.  **Integrate** seamlessly with **Nevermined Payments**, listening for “step-updated” events and updating steps as they progress or fail.
@@ -66,7 +66,7 @@ This **Song Generator Agent** is part of a larger ecosystem of AI-driven media c
 ------------
 
 *   **Nevermined Integration**: Subscribes to tasks via `step-updated` events and updates them automatically.
-*   **Automatic Metadata Generation**: Uses **LangChain** + **OpenAI** for lyrics, titles, and tag creation.
+*   **Automatic Metadata Generation**: Uses **Gaia** for lyrics, titles, and tag creation.
 *   **Suno Music Generation**: Calls Suno’s AI for track synthesis, monitors progress, and retrieves the final MP3.
 *   **Concurrent Step Handling**: Splits tasks into multiple steps (e.g., `autoGenerateMetadata`, `buildSong`), each with its own logic.
 *   **Configurable**: Customize your prompts, model versions, or usage of OpenAI.
@@ -82,7 +82,7 @@ This **Song Generator Agent** is part of a larger ecosystem of AI-driven media c
 *   **TypeScript** (project built on ^5.7.0 or later)
 *   **Nevermined** credentials (API key, environment settings, and an `AGENT_DID`)
 *   **Suno API Key** (for music generation)
-*   **OpenAI API Key** (for metadata/lyrics generation via LangChain)
+*   **Gaia Node Details** (for metadata/lyrics generation via LangChain)
 
 * * *
 
@@ -92,7 +92,7 @@ This **Song Generator Agent** is part of a larger ecosystem of AI-driven media c
 1.  **Clone** the repository:
     
     ```bash
-    git clone https://github.com/nevermined-io/song-generation-agent.git
+    git clone https://github.com/harishkotra/song-generation-agent-gaia.git
     cd song-generation-agent
     ```
     
@@ -118,20 +118,24 @@ Rename `.env.example` to `.env` and set the required variables:
 
 ```env
 SUNO_API_KEY=your_suno_api_key
-OPENAI_API_KEY=your_openai_api_key
 NVM_API_KEY=your_nevermined_api_key
 NVM_ENVIRONMENT=testing
 AGENT_DID=did:nv:xxx-song-agent
 IS_DUMMY=false
 DUMMY_JOB_ID=foobar
+GAIA_API_KEY=your_gaia_api_key
+GAIA_NODE_URL=your_gaia_node_url
+GAIA_MODEL_NAME=your_gaia_node_model_name
 ```
 
 *   `SUNO_API_KEY`
-*   `OPENAI_API_KEY`
 *   `NVM_API_KEY`
 *   `NVM_ENVIRONMENT` (e.g., `testing`, `staging`, or `production`)
 *   `AGENT_DID` (identifies this Song Generator Agent)
 *   `IS_DUMMY` / `DUMMY_JOB_ID` (optional testing flags)
+*   `GAIA_API_KEY`
+*   `GAIA_NODE_URL`
+*   `GAIA_MODEL_NAME`
 
 * * *
 
@@ -228,7 +232,7 @@ When the **Song Generator Agent** receives a new **task** (usually labeled `init
 3.  **Handlers**
     
     *   **`handleInitStep()`**: Checks for existing metadata. If missing, creates two sub-steps: `autoGenerateMetadata`, then `buildSong`. If present, only creates `buildSong`.
-    *   **`handleAutoGenerateMetadataStep()`**: Uses **LangChain** + **OpenAI** to produce a JSON object with `title`, `lyrics`, `tags`.
+    *   **`handleAutoGenerateMetadataStep()`**: Uses **Gaia** to produce a JSON object with `title`, `lyrics`, `tags`.
     *   **`handleBuildSongStep()`**: Calls **Suno** using `SunoClient`. Waits until the job is complete, then stores the final track details.
 4.  **Logging & Error Handling**
     
