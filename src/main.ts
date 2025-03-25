@@ -12,7 +12,9 @@ import {
   NVM_ENVIRONMENT,
   AGENT_DID,
   SUNO_API_KEY,
-  OPENAI_API_KEY,
+  GAIA_API_KEY,
+  GAIA_MODEL_NAME,
+  GAIA_NODE_URL,
   IS_DUMMY,
   DUMMY_JOB_ID,
 } from "./config/env";
@@ -118,7 +120,7 @@ async function handleAutoGenerateMetadataStep(
   );
 
   try {
-    const generator = new SongMetadataGenerator(OPENAI_API_KEY);
+    const generator = new SongMetadataGenerator(GAIA_API_KEY, GAIA_MODEL_NAME, GAIA_NODE_URL);
     const idea = step.input_query || "A generic acoustic folk song";
     const { title, lyrics, tags } = await generator.generateMetadata(idea);
 
@@ -126,7 +128,7 @@ async function handleAutoGenerateMetadataStep(
     await payments.query.updateStep(step.did, {
       ...step,
       step_status: AgentExecutionStatus.Completed,
-      output: "Successfully generated metadata via LangChain",
+      output: "Successfully generated metadata via Gaia",
       output_artifacts: [{ title, lyrics, tags, idea }],
     });
   } catch (error) {
